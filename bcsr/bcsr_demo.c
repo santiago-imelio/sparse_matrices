@@ -47,14 +47,15 @@ int main()
 
     spmv_bcsr(C, v, x);
 
-    for (int k = 0; k < m; k++)
-    {
-        printf("%.1f ", x[k]);
-    }
+    // for (int k = 0; k < m; k++)
+    // {
+    //     printf("%.1f ", x[k]);
+    // }
 
     free(C->values);
     free(C->col_index);
     free(C->row_ptr);
+    free(C->nz_ptr);
     free(C);
     free(v);
     free(x);
