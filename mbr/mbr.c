@@ -1,27 +1,17 @@
 #include "mbr.h"
 #include <stdio.h>
 
-// void spmv_mbr(mbr *a, float *v, float *x)
-// {
-//     int block_rows = a->blk_rows;
-//     int block_columns = a->blk_columns;
-
-//     for (int by = 0; by < block_rows; by++)
-//     {
-//         for (int bx = 0; bx < block_columns; bx++)
-//         {
-//             int blk = by * block_columns + bx;
-//             printf("Block %d\n", blk);
-//         }
-//     }
-// };
-
 void spmv_mbr(mbr *a, float *v, float *x)
 {
+    for (int i = 0; i < a->m; i++)
+        x[i] = 0;
+
     int block_rows = a->blk_rows;
     int block_columns = a->blk_columns;
     int r = a->r;
     int c = a->c;
+
+    int values_idx = 0;
 
     for (int by = 0; by < a->blk_rows; by++)
     {
@@ -30,39 +20,28 @@ void spmv_mbr(mbr *a, float *v, float *x)
 
         for (int blk_id = block_x_start; blk_id < block_x_end; blk_id++)
         {
-            float xi = 0;
-
             int bx = a->col_index[blk_id];
             int bmap = a->bitmap[blk_id];
 
             int bit_idx = 0;
-            int i;
 
-            /***** TODO: this part is wrong ******/
             while (bmap != 0)
             {
-                printf("Block %d - Bitmap is %d - Looking at bit %d\n", blk_id, bmap, bit_idx);
                 if ((bmap & 1) == 1)
                 {
-                    i = bit_idx % r + by * r;
-                    int j = bit_idx % c + bx * c;
+                    int row_in_block = bit_idx / c; // Row within the block
+                    int col_in_block = bit_idx % c; // Column within the block
 
-                    printf("Doing values[%d] * v[%d]\n", i, j);
-                    printf("\n");
-                    xi += a->values[i] * v[j];
+                    int i = by * r + row_in_block; // Row in matrix
+                    int j = bx * c + col_in_block; // Column in matrix
+
+                    x[i] += a->values[values_idx] * v[j];
+                    values_idx++;
                 }
 
-                x[i] = xi;
-
-                bmap = bmap >> 1;
-
-                if (bmap == 0) {
-                    bit_idx = 0;
-                } else {
-                    bit_idx++;
-                }
+                bmap >>= 1;
+                bmap == 0 ? bit_idx = 0 : bit_idx++;
             }
-            /***** TODO: this part is wrong ******/
         }
     }
 };

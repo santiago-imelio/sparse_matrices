@@ -3,6 +3,8 @@
  */
 typedef struct mbr
 {
+    int m;
+    int n;
     int blk_rows;
     int blk_columns;
     int nnz_blocks;

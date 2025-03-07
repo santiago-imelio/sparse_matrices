@@ -17,7 +17,7 @@ int main()
     int *row_ptr = (int *)malloc((nnz_blocks + 1) * sizeof(int));
     int *bmap = (int *)malloc(nnz_blocks * sizeof(int));
 
-    float values_static[] = {5,1,0,1,7,0,0,2,0,0,3,0,0,2,0,0,4,0,1,3,0,6,0,0,3,0,0,0};
+    float values_static[] = {5,1,1,7,2,3,2,4,1,3,6,3};
     for (int i = 0; i < (nnz_blocks * r * c); i++)
         values[i] = values_static[i];
 
