@@ -1,14 +1,6 @@
 #include "mbr_debruijn.h"
+#include "debruijn.h"
 #include <stdio.h>
-
-// De Bruijn sequence
-#define DEBRUIJN32 0x077CB531U
-
-// Lookup table for bit position
-static const int debruijn_bit_index[32] = {
-    0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
-    31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-};
 
 void spmv_mbr(mbr *a, float *v, float *x)
 {
@@ -34,10 +26,9 @@ void spmv_mbr(mbr *a, float *v, float *x)
 
             while (bmap != 0)
             {
-                // Find the position of the least significant set bit
-                int y = bmap & (-bmap);
-                int z = (int) DEBRUIJN32 * y;
-                int bit_idx = debruijn_bit_index[z >> 27];
+                int s = bmap & (-bmap); // Isolates the LSB in a single-1 word
+                int z = debruijn_hash(s);
+                int bit_idx = debruijn_lookup[z];
 
                 bmap &= bmap - 1; // Clear the least significant set bit
 
